@@ -10,9 +10,67 @@ This repo shows in action [timeplus-io/proton](https://github.com/timeplus-io/pr
 - [owl-shop sample app](https://github.com/cloudhut/owl-shop) producing data to cluster kafka-1
 - [owl-shop sample app](https://github.com/cloudhut/owl-shop) producing data to cluster kafka-2
 
-## Running it
+
+## Launch the environment
 ```
 docker compose up -d
 ```
 
 
+## Launch the SQL Client
+```
+docker compose exec -it proton proton-client
+```
+
+
+## SQL Queries
+
+### Analytics over a single stream
+
+```
+-- Create external stream to read data from Kafka
+CREATE EXTERNAL STREAM frontend_events_1(raw string)
+SETTINGS type='kafka', 
+         brokers='kafka-1:9092',
+         topic='owlshop-frontend-events';
+```
+
+```
+-- Scan incoming events
+select * from frontend_events_1;
+```
+
+```
+-- Get live count
+select count() from frontend_events_1;
+```
+
+```
+-- Filter events by JSON attributes
+select _tp_time, raw:ipAddress, raw:requestedUrl from frontend_events_1 where raw:method='POST';
+```
+
+```
+-- Show a live ASCII bar chart
+select raw:method, count() as cnt, bar(cnt, 0, 40,5) as bar from frontend_events
+group by raw:method order by cnt desc limit 5 by emit_version();
+```
+
+
+### Analytics over multiple streams
+
+```
+-- Create a second stream, agains the second cluster
+CREATE EXTERNAL STREAM frontend_events_2(raw string)
+SETTINGS type='kafka', 
+         brokers='kafka-2:9093',
+         topic='owlshop-frontend-events';
+```
+
+```
+-- Let's join both streams, from different Kafka clusters
+SELECT stream_1.raw:ipAddress, stream_1.raw:method, stream_1.raw:requestedUrl 
+    FROM frontend_events_1 as stream_1
+INNER JOIN frontend_events_2 AS stream_2
+ON stream_1.raw:requestedUrl = stream_2.raw:requestedUrl
+```
