@@ -4,10 +4,10 @@ This repo shows in action [timeplus-io/proton](https://github.com/timeplus-io/pr
 
 ## Components
 
-- proton engine
-- single node Kafka cluster
-- redpanda console
-- owl-shop sample app producing data
+- Proton engine
+- Single node Kafka cluster
+- Redpanda console
+- [owl-shop sample app](https://github.com/cloudhut/owl-shop) to produce data
 
 ## Running it
 ```
