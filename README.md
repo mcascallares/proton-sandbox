@@ -48,7 +48,7 @@ SELECT *
 
 ```
 -- Get live count
-SELEXT count() 
+SELECT count() 
     FROM frontend_events_1;
 ```
 
