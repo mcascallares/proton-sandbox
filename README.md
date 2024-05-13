@@ -149,6 +149,8 @@ CREATE MATERIALIZED VIEW mv INTO join_output_topic AS
     - Use the 8123 port. In this mode, all SQL are ran in batch mode. So select .. from car_live_data will read all existing data.
     - Use 3218 port. In this mode, by default all SQL are ran in streaming mode. Please use select .. from .. LIMIT 100 to stop the query at 100 events. Or use the table function to query historical data, such as select .. from table(car_live_data)..
 
+![DBVisualizer]([http://url/to/img.png](https://github.com/3936d4f3-dd6c-436c-b5ed-779d2575fb6c))
+
 
 ## Pushing data with Connect
 
