@@ -42,23 +42,30 @@ SETTINGS type='kafka',
 
 ```
 -- Scan incoming events
-select * from frontend_events_1;
+SELECT *
+    FROM frontend_events_1;
 ```
 
 ```
 -- Get live count
-select count() from frontend_events_1;
+SELEXT count() 
+    FROM frontend_events_1;
 ```
 
 ```
 -- Filter events by JSON attributes
-select _tp_time, raw:ipAddress, raw:requestedUrl from frontend_events_1 where raw:method='POST';
+SELEXT _tp_time, raw:ipAddress, raw:requestedUrl 
+    FROM frontend_events_1 
+    WHERE raw:method='POST';
 ```
 
 ```
 -- Show a live ASCII bar chart
-select raw:method, count() as cnt, bar(cnt, 0, 40,5) as bar from frontend_events_1
-group by raw:method order by cnt desc limit 5 by emit_version();
+SELECT raw:method, count() as cnt, bar(cnt, 0, 40,5) as bar 
+    FROM frontend_events_1
+    GROUP BY raw:method 
+    ORDER BY cnt desc 
+    LIMIT 5 by emit_version();
 ```
 
 
@@ -82,12 +89,15 @@ ON stream_1.raw:method = stream_2.raw:method
 
 ```
 -- Show the timestamp for each event
-SELECT _tp_time from frontend_events_1;
+SELECT _tp_time 
+    FROM frontend_events_1;
 ```
 
 ```
 -- Set offset initial behavior 
-SELECT * from frontend_events_1 SETTINGS seek_to='earliest';
+SELECT * 
+    FROM frontend_events_1 
+    SETTINGS seek_to='earliest';
 ```
 
 ### Output a join to a new topic
@@ -128,9 +138,9 @@ CREATE MATERIALIZED VIEW mv INTO join_output_topic AS
            stream_2.raw:ipAddress AS ip2,
            stream_1.raw:requestedUrl AS url1,
            stream_2.raw:requestedUrl AS url2
-    FROM frontend_events_1 as stream_1
-    INNER JOIN frontend_events_2 AS stream_2
-    ON stream_1.raw:method = stream_2.raw:method
+        FROM frontend_events_1 as stream_1
+        INNER JOIN frontend_events_2 AS stream_2
+        ON stream_1.raw:method = stream_2.raw:method
 ```
 
 ## JDBC Access
@@ -150,6 +160,7 @@ CREATE MATERIALIZED VIEW mv INTO join_output_topic AS
     - Use 3218 port. In this mode, by default all SQL are ran in streaming mode. Please use select .. from .. LIMIT 100 to stop the query at 100 events. Or use the table function to query historical data, such as select .. from table(car_live_data)..
 
 ![DBVisualizer](https://github.com/mcascallares/proton-sandbox/blob/main/images/dbvis.png)
+
 
 
 ## Pushing data with Connect
