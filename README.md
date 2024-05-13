@@ -203,7 +203,6 @@ curl -s -X POST http://localhost:3218/proton/v1/ingest/streams/my_http_stream \
 }'
 ```
 
-
 ## Working with keyed topics
 
 ### Select from keyed topics
@@ -264,3 +263,20 @@ docker compose exec -it kafka-1 /opt/kafka/bin/kafka-console-consumer.sh \
     --from-beginning \
     --property print.key=true
 ```
+
+
+## Working with Schema Registry
+
+```
+CREATE OR REPLACE FORMAT SCHEMA search_request AS '
+    syntax = "proto3";
+
+    message SearchRequest {
+        string query = 1;
+        int32 page_number = 2;
+        int32 results_per_page = 3;
+    }
+    ' TYPE Protobuf
+```
+
+**Writing Avro/Protobuf data with schema registry is not supported yet (coming soon).**
