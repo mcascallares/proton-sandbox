@@ -54,7 +54,7 @@ SELECT count()
 
 ```
 -- Filter events by JSON attributes
-SELEXT _tp_time, raw:ipAddress, raw:requestedUrl 
+SELECT _tp_time, raw:ipAddress, raw:requestedUrl 
     FROM frontend_events_1 
     WHERE raw:method='POST';
 ```
