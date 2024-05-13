@@ -145,9 +145,9 @@ CREATE MATERIALIZED VIEW mv INTO join_output_topic AS
 CREATE FUNCTION three_musketeers(value string)
     RETURNS string
     LANGUAGE JAVASCRIPT AS $$
-        function three_musketeers(value) {
+        function three_musketeers(values) {
             var  musketeers = [ "tomas", "matias", "akhi" ];
-            return value.map(v=>musketeers[v.length % 3]);
+            return values.map(v=>musketeers[v.length % 3]);
         }
 $$;
 ```
