@@ -68,6 +68,18 @@ SELECT raw:method, count() as cnt, bar(cnt, 0, 40,5) as bar
     LIMIT 5 by emit_version();
 ```
 
+```
+-- Show the timestamp for each event
+SELECT _tp_time 
+    FROM frontend_events_1;
+```
+
+```
+-- Set offset initial behavior 
+SELECT * 
+    FROM frontend_events_1 
+    SETTINGS seek_to='earliest';
+```
 
 ### Analytics over multiple streams
 
@@ -85,19 +97,6 @@ SELECT stream_1.raw:ipAddress, stream_1.raw:method, stream_1.raw:requestedUrl
     FROM frontend_events_1 as stream_1
 INNER JOIN frontend_events_2 AS stream_2
 ON stream_1.raw:method = stream_2.raw:method
-```
-
-```
--- Show the timestamp for each event
-SELECT _tp_time 
-    FROM frontend_events_1;
-```
-
-```
--- Set offset initial behavior 
-SELECT * 
-    FROM frontend_events_1 
-    SETTINGS seek_to='earliest';
 ```
 
 ### Output a join to a new topic
@@ -143,6 +142,25 @@ CREATE MATERIALIZED VIEW mv INTO join_output_topic AS
         ON stream_1.raw:method = stream_2.raw:method
 ```
 
+## Custom UDF Functions
+
+```
+-- Let's register the function
+CREATE FUNCTION three_musketeers(value string)
+    RETURNS string
+    LANGUAGE JAVASCRIPT AS $$
+        function three_musketeers(value) {
+            var  musketeers = [ "tomas", "matias", "akhi" ];
+            return value.map(v=>musketeers[v.length % 3]);
+        }
+$$;
+```
+
+```
+-- Let's use it!
+SELEXT raw:requestedUrl, three_musketeers(raw:requestedUrl)
+    FROM frontend_events_1;
+```
 
 ## JDBC Access
 
