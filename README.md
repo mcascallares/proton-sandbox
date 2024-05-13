@@ -85,6 +85,11 @@ ON stream_1.raw:method = stream_2.raw:method
 SELECT _tp_time from frontend_events_1;
 ```
 
+```
+-- Set offset initial behavior 
+SELECT * from frontend_events_1 SETTINGS seek_to='earliest';
+```
+
 ### Output a join to a new topic
 
 ```
