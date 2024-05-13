@@ -120,7 +120,7 @@ It will fail, we need to create the topic upfront and repeat the
 above command
 
 ```
-docker compose exec -it kafka-1 bas
+docker compose exec -it kafka-1 bash
 ```
 
 ```
