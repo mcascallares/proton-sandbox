@@ -121,7 +121,6 @@ above command
 
 ```
 docker compose exec -it kafka-1 ./opt/kafka/bin/kafka-topics.sh --create \
-
     --topic join_output_topic \
     --bootstrap-server kafka-1:9092
 ```
@@ -204,13 +203,8 @@ curl -s -X POST http://localhost:3218/proton/v1/ingest/streams/my_http_stream \
 }'
 ```
 
-## Pushing data with Connect
-
-WIP
-
 
 ## Working with keyed topics
-
 
 ### Select from keyed topics
 
@@ -218,17 +212,19 @@ WIP
 -- reading stream from kafka
 CREATE EXTERNAL STREAM customers(
   raw string)
-SETTINGS type='kafka', 
-         brokers='kafka-1:9092',
-         topic='owlshop-customers';
-
+    SETTINGS type='kafka', 
+        brokers='kafka-1:9092',
+        topic='owlshop-customers';
 
 -- Key is available via keyword
-SELECT _message_key, * FROM customers SETTINGS seek_to='earliest';
+SELECT _message_key, * 
+    FROM customers 
+    SETTINGS seek_to='earliest';
 
 -- You can search on these keys
-SELECT _message_key,* FROM customers where _message_key='0a1d9f19-e46e-49f5-baa9-569ba9cf83b9' SETTINGS seek_to='earliest';
-
+SELECT _message_key, * 
+    FROM customers where _message_key='0a1d9f19-e46e-49f5-baa9-569ba9cf83b9' 
+    SETTINGS seek_to='earliest';
 ```
 
 ### Pushing to a topic with key
@@ -262,5 +258,9 @@ CREATE MATERIALIZED VIEW mv2 INTO keyed_events AS
 Check data is being exported
 
 ```
-docker compose exec -it kafka-1 ./opt/kafka/bin/kafka-console-consumer.sh --topic keyed_events --bootstrap-server kafka-1:9092 --from-beginning --property print.key=true
+docker compose exec -it kafka-1 /opt/kafka/bin/kafka-console-consumer.sh \
+    --topic keyed_events \
+    --bootstrap-server kafka-1:9092 \
+    --from-beginning \
+    --property print.key=true
 ```
