@@ -235,7 +235,7 @@ SELECT _message_key,* FROM customers where _message_key='0a1d9f19-e46e-49f5-baa9
 
 Create the topic
 
-````
+```
 docker compose exec -it kafka-1 ./opt/kafka/bin/kafka-topics.sh --create \
     --topic keyed_events \
     --bootstrap-server kafka-1:9092
