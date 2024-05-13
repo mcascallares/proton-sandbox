@@ -190,11 +190,8 @@ CREATE STREAM my_http_stream(id int, name string);
 ```
 
 ```
-SELECT
-  *, _tp_append_time
-FROM
-  my_http_stream
-
+SELECT *, _tp_append_time
+    FROM my_http_stream
 ```
 
 ... and let's push data with the HTTP API
