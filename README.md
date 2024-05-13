@@ -280,3 +280,4 @@ CREATE OR REPLACE FORMAT SCHEMA search_request AS '
 ```
 
 **Writing Avro/Protobuf data with schema registry is not supported yet (coming soon).**
+https://docs.timeplus.com/proton-schema-registry#write
