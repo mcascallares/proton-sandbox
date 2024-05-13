@@ -3,7 +3,7 @@ services:
   proton:
      image: ghcr.io/timeplus-io/proton:latest
      ports:
-      #  - 3218:3218 #http port for JDBC driver, default streaming mode
+       - 3218:3218 #http port for JDBC driver, default streaming mode
        - 8123:8123 #http port for JDBC driver, default batch mode
 
   kafka-1:
