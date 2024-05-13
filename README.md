@@ -143,6 +143,7 @@ CREATE MATERIALIZED VIEW mv INTO join_output_topic AS
         ON stream_1.raw:method = stream_2.raw:method
 ```
 
+
 ## JDBC Access
 
 ### Requirements
@@ -162,6 +163,33 @@ CREATE MATERIALIZED VIEW mv INTO join_output_topic AS
 ![DBVisualizer](https://github.com/mcascallares/proton-sandbox/blob/main/images/dbvis.png)
 
 
+## HTTP API
+
+```
+-- Let's create a stream
+CREATE STREAM my_http_stream(id int, name string);
+```
+
+```
+SELECT
+  *, _tp_append_time
+FROM
+  my_http_stream
+
+```
+
+... and let's push data with the HTTP API
+
+```
+curl -s -X POST http://localhost:3218/proton/v1/ingest/streams/my_http_stream \
+-d '{
+  "columns": ["id","name"],
+  "data": [
+    [1,"hello"],
+    [2,"world"]
+  ]
+}'
+```
 
 ## Pushing data with Connect
 
