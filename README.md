@@ -138,7 +138,9 @@ CREATE MATERIALIZED VIEW mv INTO join_output_topic AS
         ON stream_1.raw:method = stream_2.raw:method
 ```
 
-## Custom UDF Functions
+## Custom Functions
+
+### UDF: do not store state
 
 ```
 -- Let's register the function
@@ -156,6 +158,61 @@ $$;
 -- Let's use it!
 SELECT raw:requestedUrl, three_musketeers(raw:requestedUrl)
     FROM frontend_events_1;
+```
+
+### UDAF: storing states
+
+```
+CREATE AGGREGATE FUNCTION sum_musketeers(value string) 
+RETURNS string 
+LANGUAGE JAVASCRIPT AS $$
+{
+    initialize: function() {
+        this.tomas = 0.0;
+        this.matias = 0.0;
+        this.akhi = 0.0;
+    },
+    process: function(values) {
+        for (let i = 0; i < values.length; i++) {
+            if (values[i] === 'matias') {
+                this.matias += 1;
+                this.tomas -= 1;
+            } if (values[i] === 'tomas') {
+                this.matias -= 1;
+                this.tomas += 1;
+            }
+            this.akhi += 1;
+        }
+    },
+    finalize: function() {
+        return 'tomas: ' + this.tomas + ', matias: ' + this.matias + ', akhi: ' + this.akhi;
+    },
+    serialize: function() {
+        let s = {
+            'tomas': this.tomas,
+            'matias': this.matias,
+            'akhi': this.akhi
+        };
+        return JSON.stringify(s)
+    },
+    deserialize: function(state_str) {
+        let s = JSON.parse(state_str);
+        this.tomas = s['tomas'];
+        this.matias = s['matias'];
+        this.akhi = s['akhi'];
+    },
+    merge: function(state_str) {
+        let s = JSON.parse(state_str);
+        this.tomas += s['tomas'];
+        this.matias += s['matias'];
+        this.akhi += s['akhi'];
+    }
+}
+$$;
+
+-- Let's use it!
+SELECT sum_musketeers(three_musketeers(raw:requestedUrl)) 
+FROM frontend_events_1;
 ```
 
 
