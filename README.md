@@ -48,13 +48,13 @@ SELECT *
 
 ```
 -- Get live count
-SELEXT count() 
+SELECT count() 
     FROM frontend_events_1;
 ```
 
 ```
 -- Filter events by JSON attributes
-SELEXT _tp_time, raw:ipAddress, raw:requestedUrl 
+SELECT _tp_time, raw:ipAddress, raw:requestedUrl 
     FROM frontend_events_1 
     WHERE raw:method='POST';
 ```
@@ -66,25 +66,6 @@ SELECT raw:method, count() as cnt, bar(cnt, 0, 40,5) as bar
     GROUP BY raw:method 
     ORDER BY cnt desc 
     LIMIT 5 by emit_version();
-```
-
-
-### Analytics over multiple streams
-
-```
--- Create a second stream, agains the second cluster
-CREATE EXTERNAL STREAM frontend_events_2(raw string)
-SETTINGS type='kafka', 
-         brokers='kafka-2:9093',
-         topic='owlshop-frontend-events';
-```
-
-```
--- Let's join both streams, from different Kafka clusters
-SELECT stream_1.raw:ipAddress, stream_1.raw:method, stream_1.raw:requestedUrl 
-    FROM frontend_events_1 as stream_1
-INNER JOIN frontend_events_2 AS stream_2
-ON stream_1.raw:method = stream_2.raw:method
 ```
 
 ```
@@ -100,6 +81,24 @@ SELECT *
     SETTINGS seek_to='earliest';
 ```
 
+### Analytics over multiple streams
+
+```
+-- Create a second stream, agains the second cluster
+CREATE EXTERNAL STREAM frontend_events_2(raw string)
+    SETTINGS type='kafka', 
+        brokers='kafka-2:9093',
+        topic='owlshop-frontend-events';
+```
+
+```
+-- Let's join both streams, from different Kafka clusters
+SELECT stream_1.raw:ipAddress, stream_1.raw:method, stream_1.raw:requestedUrl 
+    FROM frontend_events_1 as stream_1
+    INNER JOIN frontend_events_2 AS stream_2
+    ON stream_1.raw:method = stream_2.raw:method
+```
+
 ### Output a join to a new topic
 
 ```
@@ -111,10 +110,10 @@ CREATE EXTERNAL STREAM join_output_topic(
     url1 string, 
     url2 string)
     SETTINGS type='kafka', 
-             brokers='kafka-1:9092', 
-             topic='join_output_topic', 
-             data_format='JSONEachRow',
-             one_message_per_row=true;
+        brokers='kafka-1:9092', 
+        topic='join_output_topic', 
+        data_format='JSONEachRow',
+        one_message_per_row=true;
 ```
 
 It will fail, we need to create the topic upfront and repeat the 
@@ -122,6 +121,7 @@ above command
 
 ```
 docker compose exec -it kafka-1 ./opt/kafka/bin/kafka-topics.sh --create \
+
     --topic join_output_topic \
     --bootstrap-server kafka-1:9092
 ```
@@ -137,6 +137,26 @@ CREATE MATERIALIZED VIEW mv INTO join_output_topic AS
         FROM frontend_events_1 as stream_1
         INNER JOIN frontend_events_2 AS stream_2
         ON stream_1.raw:method = stream_2.raw:method
+```
+
+## Custom UDF Functions
+
+```
+-- Let's register the function
+CREATE FUNCTION three_musketeers(value string)
+    RETURNS string
+    LANGUAGE JAVASCRIPT AS $$
+        function three_musketeers(value) {
+            var  musketeers = [ "tomas", "matias", "akhi" ];
+            return value.map(v=>musketeers[v.length % 3]);
+        }
+$$;
+```
+
+```
+-- Let's use it!
+SELEXT raw:requestedUrl, three_musketeers(raw:requestedUrl)
+    FROM frontend_events_1;
 ```
 
 
@@ -167,11 +187,8 @@ CREATE STREAM my_http_stream(id int, name string);
 ```
 
 ```
-SELECT
-  *, _tp_append_time
-FROM
-  my_http_stream
-
+SELECT *, _tp_append_time
+    FROM my_http_stream
 ```
 
 ... and let's push data with the HTTP API

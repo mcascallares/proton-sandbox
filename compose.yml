@@ -1,7 +1,7 @@
 name: proton-sandbox
 services:
   proton:
-     image: ghcr.io/timeplus-io/proton:latest
+     image: ghcr.io/timeplus-io/proton:1.5.8-rc
      ports:
        - 3218:3218 #http port for JDBC driver, default streaming mode
        - 8123:8123 #http port for JDBC driver, default batch mode
