@@ -2,6 +2,11 @@
 
 This repo shows in action [timeplus-io/proton](https://github.com/timeplus-io/proton), as a streaming SQL engine.
 
+## Requirements
+
+- Docker engine must be in version 26.1.1 or above
+- Docker Desktop 4.30.0 (149282)
+
 ## Components
 
 - Proton engine
@@ -73,6 +78,11 @@ SELECT stream_1.raw:ipAddress, stream_1.raw:method, stream_1.raw:requestedUrl
     FROM frontend_events_1 as stream_1
 INNER JOIN frontend_events_2 AS stream_2
 ON stream_1.raw:method = stream_2.raw:method
+```
+
+```
+-- Show the timestamp for each event
+SELECT _tp_time from frontend_events_1;
 ```
 
 ## JDBC Access
