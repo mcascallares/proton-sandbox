@@ -162,6 +162,7 @@ SELEXT raw:requestedUrl, three_musketeers(raw:requestedUrl)
     FROM frontend_events_1;
 ```
 
+
 ## JDBC Access
 
 ### Requirements
