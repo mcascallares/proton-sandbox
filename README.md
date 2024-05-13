@@ -52,7 +52,7 @@ select _tp_time, raw:ipAddress, raw:requestedUrl from frontend_events_1 where ra
 
 ```
 -- Show a live ASCII bar chart
-select raw:method, count() as cnt, bar(cnt, 0, 40,5) as bar from frontend_events
+select raw:method, count() as cnt, bar(cnt, 0, 40,5) as bar from frontend_events_1
 group by raw:method order by cnt desc limit 5 by emit_version();
 ```
 
@@ -72,7 +72,7 @@ SETTINGS type='kafka',
 SELECT stream_1.raw:ipAddress, stream_1.raw:method, stream_1.raw:requestedUrl 
     FROM frontend_events_1 as stream_1
 INNER JOIN frontend_events_2 AS stream_2
-ON stream_1.raw:requestedUrl = stream_2.raw:requestedUrl
+ON stream_1.raw:method = stream_2.raw:method
 ```
 
 ## JDBC Access
