@@ -85,6 +85,49 @@ ON stream_1.raw:method = stream_2.raw:method
 SELECT _tp_time from frontend_events_1;
 ```
 
+### Output a join to a new topic
+
+```
+-- Create a external stream
+CREATE EXTERNAL STREAM join_output_topic(
+    _tp_time datetime64(3), 
+    ip1 string, 
+    ip2 string,
+    url1 string, 
+    url2 string)
+    SETTINGS type='kafka', 
+             brokers='kafka-1:9092', 
+             topic='join_output_topic', 
+             data_format='JSONEachRow',
+             one_message_per_row=true;
+```
+
+It will fail, we need to create the topic upfront and repeat the 
+above command
+
+```
+docker compose exec -it kafka-1 bas
+```
+
+```
+./kafka-topics.sh --create \
+    --topic join_output_topic \
+    --bootstrap-server kafka-1:9092
+```
+
+```
+-- Let's create the materialized view that will populate the join
+CREATE MATERIALIZED VIEW mv INTO join_output_topic AS 
+    SELECT now64() AS _tp_time, 
+           stream_1.raw:ipAddress AS ip1,
+           stream_2.raw:ipAddress AS ip2,
+           stream_1.raw:requestedUrl AS url1,
+           stream_2.raw:requestedUrl AS url2
+    FROM frontend_events_1 as stream_1
+    INNER JOIN frontend_events_2 AS stream_2
+    ON stream_1.raw:method = stream_2.raw:method
+```
+
 ## JDBC Access
 
 ### Requirements
